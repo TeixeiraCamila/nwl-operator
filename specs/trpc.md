@@ -361,15 +361,17 @@ export default function RootLayout({
 
 ## TODOs de implementacao
 
-- [ ] Criar `src/trpc/init.ts` — initTRPC, context com `db`, baseProcedure
-- [ ] Criar `src/trpc/routers/roast.ts` — procedures getById, getStats, create (placeholder)
-- [ ] Criar `src/trpc/routers/_app.ts` — appRouter mergeando sub-routers
-- [ ] Criar `src/trpc/query-client.ts` — makeQueryClient factory
-- [ ] Criar `src/trpc/client.tsx` — TRPCReactProvider, useTRPC
-- [ ] Criar `src/trpc/server.tsx` — createTRPCOptionsProxy, HydrateClient, caller
-- [ ] Criar `src/app/api/trpc/[trpc]/route.ts` — fetch adapter handler
-- [ ] Modificar `src/app/layout.tsx` — adicionar TRPCReactProvider
-- [ ] Substituir dados hardcoded em `src/app/page.tsx` por chamadas tRPC
-- [ ] Substituir dados hardcoded em `src/app/roast/[id]/page.tsx` por chamadas tRPC
+- [x] Criar `src/trpc/init.ts` — initTRPC, context com `db`, baseProcedure
+- [x] Criar `src/trpc/routers/roast.ts` — procedure getStats
+- [x] Criar `src/trpc/routers/_app.ts` — appRouter mergeando sub-routers
+- [x] Criar `src/trpc/query-client.ts` — makeQueryClient factory
+- [x] Criar `src/trpc/client.tsx` — TRPCReactProvider, useTRPC
+- [x] Criar `src/trpc/server.tsx` — createTRPCOptionsProxy, HydrateClient, caller
+- [x] Criar `src/app/api/trpc/[trpc]/route.ts` — fetch adapter handler
+- [x] Modificar `src/app/layout.tsx` — adicionar TRPCReactProvider
+- [x] Substituir dados hardcoded em `src/app/page.tsx` por StatsMetrics com tRPC
+- [ ] Criar procedure `roast.getById` para pagina de resultado
+- [ ] Criar procedure `roast.create` para submeter codigo
+- [ ] Criar procedure `leaderboard.list` para listagem
 - [ ] Rodar lint + typecheck em todos os arquivos
 - [ ] Testar build completo
