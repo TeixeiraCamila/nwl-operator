@@ -1,6 +1,7 @@
-import { StatsCard } from "./stats-card";
+import { FooterHint } from "@/components/sections/footer-hint";
 import { createCaller } from "@/trpc/server";
 import { createTRPCContext } from "@/trpc/init";
+import { StatsValue } from "./stats-value";
 
 interface StatsMetricsProps {
   className?: string;
@@ -17,9 +18,14 @@ export async function StatsMetrics({ className }: StatsMetricsProps) {
   }
 
   return (
-    <div className={className}>
-      <StatsCard value={stats.totalRoasts} label="codes roasted" />
-      <StatsCard value={stats.avgScore} suffix="/10" label="avg score" />
-    </div>
+    <FooterHint className={className}>
+      <FooterHint.Item>
+        <StatsValue value={stats.totalRoasts} /> codes roasted
+      </FooterHint.Item>
+      <FooterHint.Separator />
+      <FooterHint.Item>
+        avg score: <StatsValue value={stats.avgScore} decimals={1} suffix="/10" />
+      </FooterHint.Item>
+    </FooterHint>
   );
 }
