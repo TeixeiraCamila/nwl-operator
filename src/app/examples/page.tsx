@@ -1,7 +1,8 @@
 import {
   AnalysisCard,
+  AnalysisCardDescription,
+  AnalysisCardTitle,
   Badge,
-  BadgeDot,
   Button,
   CodeBlock,
   DiffLine,
@@ -84,8 +85,8 @@ export default function ExamplesPage() {
             Switch component with label
           </p>
           <div className="flex flex-wrap items-center gap-6">
-            <Toggle>roast mode</Toggle>
-            <Toggle>roast mode</Toggle>
+            <Toggle label="roast mode" />
+            <Toggle label="roast mode" defaultChecked />
           </div>
         </section>
 
@@ -102,19 +103,10 @@ export default function ExamplesPage() {
           <p className="font-mono text-sm text-text-secondary">
             Status badges with dot indicator
           </p>
-          <div className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-2">
-              <BadgeDot className="bg-accent-red" />
-              <Badge variant="critical">critical</Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <BadgeDot className="bg-accent-amber" />
-              <Badge variant="warning">warning</Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <BadgeDot className="bg-accent-green" />
-              <Badge variant="good">good</Badge>
-            </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <Badge variant="critical">critical</Badge>
+            <Badge variant="warning">warning</Badge>
+            <Badge variant="good">good</Badge>
           </div>
         </section>
 
@@ -131,13 +123,15 @@ export default function ExamplesPage() {
           <p className="font-mono text-sm text-text-secondary">
             Card component for code analysis
           </p>
-          <AnalysisCard severity="critical">
-            <AnalysisCard.Badge severity="critical" />
-            <AnalysisCard.Title>using var instead of const/let</AnalysisCard.Title>
-            <AnalysisCard.Description>
+          <AnalysisCard>
+            <Badge variant="critical">critical</Badge>
+            <AnalysisCardTitle>
+              using var instead of const/let
+            </AnalysisCardTitle>
+            <AnalysisCardDescription>
               the var keyword is function-scoped rather than block-scoped, which
               can lead to unexpected behavior and bugs.
-            </AnalysisCard.Description>
+            </AnalysisCardDescription>
           </AnalysisCard>
         </section>
 
@@ -154,11 +148,7 @@ export default function ExamplesPage() {
           <p className="font-mono text-sm text-text-secondary">
             Server component with syntax highlighting
           </p>
-          <CodeBlock
-            code={codeExample}
-            lang="javascript"
-            languageName="JavaScript"
-          />
+          <CodeBlock code={codeExample} lang="javascript" filename="calculate.js" />
         </section>
 
         {/* Diff Line */}
@@ -175,8 +165,8 @@ export default function ExamplesPage() {
             Visual diff lines for code changes
           </p>
           <div className="flex flex-col">
-            <DiffLine prefix="-" code="var total = 0;" type="removed" />
-            <DiffLine prefix="+" code="const total = 0;" type="added" />
+            <DiffLine type="removed">var total = 0;</DiffLine>
+            <DiffLine type="added">const total = 0;</DiffLine>
           </div>
         </section>
 
@@ -216,18 +206,9 @@ export default function ExamplesPage() {
             Circular score indicator
           </p>
           <div className="flex flex-wrap items-center gap-8">
-            <ScoreRing score={85}>
-              <ScoreRing.Value>85</ScoreRing.Value>
-              <ScoreRing.Label>Score</ScoreRing.Label>
-            </ScoreRing>
-            <ScoreRing score={45}>
-              <ScoreRing.Value>45</ScoreRing.Value>
-              <ScoreRing.Label>Score</ScoreRing.Label>
-            </ScoreRing>
-            <ScoreRing score={15}>
-              <ScoreRing.Value>15</ScoreRing.Value>
-              <ScoreRing.Label>Score</ScoreRing.Label>
-            </ScoreRing>
+            <ScoreRing score={8.5} total={10} />
+            <ScoreRing score={4.5} total={10} />
+            <ScoreRing score={1.5} total={10} />
           </div>
         </section>
       </div>

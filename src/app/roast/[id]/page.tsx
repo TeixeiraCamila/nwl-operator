@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { CodeBlock } from "@/components/code-block";
-import { Badge, BadgeDot } from "@/components/ui/badge";
+import { CodeBlock, CodeBlockHeader } from "@/components/code-block";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { LANGUAGES } from "@/lib/languages";
@@ -81,18 +81,12 @@ export default async function RoastResultPage({
     <main className="flex min-h-screen flex-col items-center bg-bg-page px-10 py-10">
       <div className="flex w-full max-w-5xl flex-col items-center gap-12">
         <div className="flex items-center gap-12">
-          <ScoreRing score={overallScore} maxScore={10}>
-            <ScoreRing.Value>{overallScore}</ScoreRing.Value>
-            <ScoreRing.Label>/10</ScoreRing.Label>
-          </ScoreRing>
+          <ScoreRing score={overallScore} total={10} />
 
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <BadgeDot className={`h-2 w-2 rounded-full bg-${scoreColor}`} />
-              <Badge variant={scoreColor as "critical" | "warning" | "good"}>
-                verdict: {verdict}
-              </Badge>
-            </div>
+            <Badge variant={scoreColor as "critical" | "warning" | "good"}>
+              verdict: {verdict}
+            </Badge>
 
             <p className="max-w-md font-mono text-xl leading-relaxed text-text-primary">
               {roastMessage}
@@ -130,13 +124,11 @@ export default async function RoastResultPage({
                 key={index}
                 className="flex w-full flex-col gap-3 border border-border-primary p-5"
               >
-                <div className="flex items-center gap-2">
-                  <Badge variant={analysis.severity}>{analysis.severity}</Badge>
-                </div>
-                <span className="font-mono text-sm text-text-primary">
+                <Badge variant={analysis.severity}>{analysis.severity}</Badge>
+                <span className="font-mono text-[13px] text-text-primary">
                   {analysis.title}
                 </span>
-                <span className="w-full font-mono text-xs leading-relaxed text-text-secondary">
+                <span className="font-mono text-xs leading-relaxed text-text-secondary">
                   {analysis.description}
                 </span>
               </div>
@@ -154,11 +146,7 @@ export default async function RoastResultPage({
             </span>
           </div>
 
-          <CodeBlock
-            code={STATIC_CODE}
-            lang={lang}
-            languageName={languageName}
-          />
+          <CodeBlock code={STATIC_CODE} lang={lang} filename={languageName} />
         </div>
 
         <div className="flex w-full max-w-3xl items-center justify-between">

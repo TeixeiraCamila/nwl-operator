@@ -73,15 +73,11 @@ export default function Home() {
 
         <div className="flex w-[780px] items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Toggle checked={roastMode} onChange={setRoastMode}>
-              <span
-                className={
-                  roastMode ? "text-accent-green" : "text-text-secondary"
-                }
-              >
-                roast mode
-              </span>
-            </Toggle>
+          <Toggle
+              checked={roastMode}
+              onCheckedChange={setRoastMode}
+              label="roast mode"
+            />
             <span className="font-mono text-xs text-text-tertiary">
               maximum sarcasm enabled
             </span>

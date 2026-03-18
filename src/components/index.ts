@@ -1,4 +1,4 @@
-export { CodeBlock } from "./code-block";
+export { CodeBlock, CodeBlockHeader } from "./code-block";
 export { CodeEditor, MAX_CHARACTERS, type CodeEditorProps } from "./code-editor";
 export type { CodeWindowProps } from "./code-window";
 export {
@@ -46,34 +46,25 @@ export {
 } from "./sections/leaderboard-preview";
 export type { TableRowProps } from "./table-row";
 export { TableRow, tableRowVariants } from "./table-row";
-export type { AnalysisCardRootProps } from "./ui/analysis-card";
+export type {
+  AnalysisCardRootProps,
+  AnalysisCardTitleProps,
+  AnalysisCardDescriptionProps,
+} from "./ui/analysis-card";
 export {
   AnalysisCard,
-  AnalysisCardBadge,
-  AnalysisCardDescription,
   AnalysisCardRoot,
   AnalysisCardTitle,
-  analysisCardVariants,
+  AnalysisCardDescription,
+  analysisCard,
 } from "./ui/analysis-card";
-export type { BadgeProps } from "./ui/badge";
-export { Badge, BadgeDot, badgeVariants } from "./ui/badge";
+export type { BadgeProps, BadgeVariants } from "./ui/badge";
+export { Badge, badge } from "./ui/badge";
 export type { ButtonProps } from "./ui/button";
 export { Button, buttonVariants } from "./ui/button";
-export type { DiffLineProps } from "./ui/diff-line";
-export {
-  DiffLine,
-  DiffLineCode,
-  DiffLinePrefix,
-  DiffLineRoot,
-  diffLineVariants,
-} from "./ui/diff-line";
+export type { DiffLineProps, DiffLineVariants } from "./ui/diff-line";
+export { DiffLine, diffLine } from "./ui/diff-line";
 export type { ScoreRingProps } from "./ui/score-ring";
-export {
-  ScoreRing,
-  ScoreRingLabel,
-  ScoreRingRoot,
-  ScoreRingValue,
-  scoreRingVariants,
-} from "./ui/score-ring";
+export { ScoreRing } from "./ui/score-ring";
 export type { ToggleProps } from "./ui/toggle";
-export { Toggle, ToggleRoot, toggleVariants } from "./ui/toggle";
+export { Toggle } from "./ui/toggle";

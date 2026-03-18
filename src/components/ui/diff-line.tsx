@@ -1,98 +1,67 @@
-import { forwardRef, type HTMLAttributes } from "react";
-
+import type { ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
-import { cn } from "@/lib/utils";
-
-const diffLineVariants = tv({
-  slots: {
-    root: "flex w-full gap-2 px-4 py-2 font-mono text-sm",
-    prefix: "w-4",
-    code: "text-text-secondary",
-  },
+const diffLine = tv({
+  base: "flex gap-2 px-4 py-2 font-mono text-[13px] w-full",
   variants: {
     type: {
-      removed: { root: "bg-accent-red/10" },
-      added: { root: "bg-accent-green/10" },
-      unchanged: { root: "" },
+      added: "bg-diff-added",
+      removed: "bg-diff-removed",
+      context: "bg-transparent",
     },
   },
   defaultVariants: {
-    type: "unchanged",
+    type: "context",
   },
 });
 
-export interface DiffLineProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof diffLineVariants> {
-  prefix?: "+" | "-" | " ";
-  code: string;
-}
-
-const DiffLineRoot = forwardRef<HTMLDivElement, DiffLineProps>(
-  ({ className, type, children, ...props }, ref) => {
-    const { root } = diffLineVariants({ type });
-
-    return (
-      <div ref={ref} className={cn(root({ className }))} {...props}>
-        {children}
-      </div>
-    );
+const diffPrefix = tv({
+  base: "select-none shrink-0",
+  variants: {
+    type: {
+      added: "text-accent-green",
+      removed: "text-accent-red",
+      context: "text-text-tertiary",
+    },
   },
-);
+  defaultVariants: {
+    type: "context",
+  },
+});
 
-DiffLineRoot.displayName = "DiffLineRoot";
+const diffContent = tv({
+  base: "",
+  variants: {
+    type: {
+      added: "text-text-primary",
+      removed: "text-text-secondary",
+      context: "text-text-secondary",
+    },
+  },
+  defaultVariants: {
+    type: "context",
+  },
+});
 
-export interface DiffLinePrefixProps extends HTMLAttributes<HTMLSpanElement> {
-  value?: "+" | "-" | " ";
-}
+type DiffLineVariants = VariantProps<typeof diffLine>;
 
-const DiffLinePrefix = forwardRef<HTMLSpanElement, DiffLinePrefixProps>(
-  ({ className, value = " ", ...props }, ref) => {
-    const { prefix } = diffLineVariants();
+type DiffLineProps = Omit<ComponentProps<"div">, "type"> & DiffLineVariants;
 
-    const prefixColor =
-      value === "-"
-        ? "text-accent-red"
-        : value === "+"
-          ? "text-accent-green"
-          : "text-text-tertiary";
+const prefixMap = {
+  added: "+",
+  removed: "-",
+  context: " ",
+} as const;
 
-    return (
-      <span
-        ref={ref}
-        className={cn(prefix({ className }), prefixColor)}
-        {...props}
-      >
-        {value}
+function DiffLine({ type, className, children, ...props }: DiffLineProps) {
+  return (
+    <div className={diffLine({ type, className })} {...props}>
+      <span className={diffPrefix({ type })}>
+        {prefixMap[type ?? "context"]}
       </span>
-    );
-  },
-);
+      <span className={diffContent({ type })}>{children}</span>
+    </div>
+  );
+}
 
-DiffLinePrefix.displayName = "DiffLinePrefix";
-
-export interface DiffLineCodeProps extends HTMLAttributes<HTMLSpanElement> {}
-
-const DiffLineCode = forwardRef<HTMLSpanElement, DiffLineCodeProps>(
-  ({ className, ...props }, ref) => {
-    const { code } = diffLineVariants();
-
-    return <span ref={ref} className={cn(code({ className }))} {...props} />;
-  },
-);
-
-DiffLineCode.displayName = "DiffLineCode";
-
-const DiffLine = Object.assign(DiffLineRoot, {
-  Prefix: DiffLinePrefix,
-  Code: DiffLineCode,
-});
-
-export {
-  DiffLine,
-  DiffLineCode,
-  DiffLinePrefix,
-  DiffLineRoot,
-  diffLineVariants,
-};
+export { DiffLine, diffLine, type DiffLineProps, type DiffLineVariants };

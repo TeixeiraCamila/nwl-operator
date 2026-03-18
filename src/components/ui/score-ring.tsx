@@ -1,118 +1,81 @@
-import { forwardRef, type HTMLAttributes } from "react";
+import type { ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 
-import { tv, type VariantProps } from "tailwind-variants";
-
-import { cn } from "@/lib/utils";
-
-const scoreRingVariants = tv({
-  slots: {
-    root: "relative flex items-center justify-center",
-    value: "font-mono text-5xl font-bold text-text-primary",
-    label: "font-mono text-base text-text-secondary",
-  },
-  variants: {
-    size: {
-      default: "h-[180px] w-[180px]",
-      sm: "h-[120px] w-[120px]",
-      lg: "h-[240px] w-[240px]",
-    },
-  },
-  defaultVariants: {
-    size: "default",
-  },
-});
-
-export interface ScoreRingProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof scoreRingVariants> {
+type ScoreRingProps = ComponentProps<"div"> & {
   score: number;
-  maxScore?: number;
+  total?: number;
+};
+
+function scoreGradientId(score: number) {
+  return `score-gradient-${score.toString().replace(".", "-")}`;
 }
 
-const ScoreRingRoot = forwardRef<HTMLDivElement, ScoreRingProps>(
-  ({ className, size, score, maxScore = 100, children, ...props }, ref) => {
-    const percentage = Math.min((score / maxScore) * 100, 100);
-    const circumference = 2 * Math.PI * 45;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+const SIZE = 180;
 
-    const strokeColor =
-      percentage >= 70
-        ? "var(--color-accent-green)"
-        : percentage >= 40
-          ? "var(--color-accent-amber)"
-          : "var(--color-accent-red)";
+function ScoreRing({ score, total = 10, className, ...props }: ScoreRingProps) {
+  const strokeWidth = 4;
+  const radius = (SIZE - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const ratio = Math.min(score / total, 1);
+  const filled = circumference * ratio;
+  const gap = circumference - filled;
+  const gradientId = scoreGradientId(score);
 
-    const { root } = scoreRingVariants({ size });
+  return (
+    <div
+      className={twMerge(
+        "relative inline-flex items-center justify-center",
+        className,
+      )}
+      style={{ width: SIZE, height: SIZE }}
+      {...props}
+    >
+      <svg
+        width={SIZE}
+        height={SIZE}
+        viewBox={`0 0 ${SIZE} ${SIZE}`}
+        className="absolute inset-0 -rotate-90"
+        role="img"
+        aria-label={`Score: ${score} out of ${total}`}
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="var(--color-accent-green)" />
+            <stop offset="100%" stopColor="var(--color-accent-amber)" />
+          </linearGradient>
+        </defs>
 
-    return (
-      <div ref={ref} className={cn(root({ className }))} {...props}>
-        <svg
-          className="absolute h-full w-full -rotate-90"
-          viewBox="0 0 100 100"
-          aria-label={`Score: ${score} out of ${maxScore}`}
-        >
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            fill="none"
-            stroke="var(--color-border-primary)"
-            strokeWidth="4"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            fill="none"
-            stroke={strokeColor}
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            className="transition-all duration-500"
-          />
-        </svg>
-        {children}
+        <circle
+          cx={SIZE / 2}
+          cy={SIZE / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--color-border-primary)"
+          strokeWidth={strokeWidth}
+        />
+
+        <circle
+          cx={SIZE / 2}
+          cy={SIZE / 2}
+          r={radius}
+          fill="none"
+          stroke={`url(#${gradientId})`}
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${filled} ${gap}`}
+          strokeLinecap="round"
+        />
+      </svg>
+
+      <div className="flex items-end gap-0.5">
+        <span className="font-mono text-5xl font-bold text-text-primary leading-none">
+          {score % 1 === 0 ? score.toFixed(1) : score.toString()}
+        </span>
+        <span className="font-mono text-base text-text-tertiary leading-none mb-1">
+          /{total}
+        </span>
       </div>
-    );
-  },
-);
+    </div>
+  );
+}
 
-ScoreRingRoot.displayName = "ScoreRingRoot";
-
-export interface ScoreRingValueProps extends HTMLAttributes<HTMLSpanElement> {}
-
-const ScoreRingValue = forwardRef<HTMLSpanElement, ScoreRingValueProps>(
-  ({ className, ...props }, ref) => {
-    const { value } = scoreRingVariants();
-
-    return <span ref={ref} className={cn(value({ className }))} {...props} />;
-  },
-);
-
-ScoreRingValue.displayName = "ScoreRingValue";
-
-export interface ScoreRingLabelProps extends HTMLAttributes<HTMLSpanElement> {}
-
-const ScoreRingLabel = forwardRef<HTMLSpanElement, ScoreRingLabelProps>(
-  ({ className, ...props }, ref) => {
-    const { label } = scoreRingVariants();
-
-    return <span ref={ref} className={cn(label({ className }))} {...props} />;
-  },
-);
-
-ScoreRingLabel.displayName = "ScoreRingLabel";
-
-const ScoreRing = Object.assign(ScoreRingRoot, {
-  Value: ScoreRingValue,
-  Label: ScoreRingLabel,
-});
-
-export {
-  ScoreRing,
-  ScoreRingLabel,
-  ScoreRingRoot,
-  ScoreRingValue,
-  scoreRingVariants,
-};
+export { ScoreRing, type ScoreRingProps };
