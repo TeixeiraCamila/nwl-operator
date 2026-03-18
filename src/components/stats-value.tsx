@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import NumberFlow from "@number-flow/react";
 
 interface StatsValueProps {
@@ -9,14 +10,25 @@ interface StatsValueProps {
 }
 
 export function StatsValue({ value, decimals = 0, suffix }: StatsValueProps) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDisplayValue(value);
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [value]);
+
   return (
     <NumberFlow
-      value={value}
+      value={displayValue}
       locales="en-US"
       format={{
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
       }}
+      suffix={suffix}
       className="inline-block tabular-nums"
     />
   );
