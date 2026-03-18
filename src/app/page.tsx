@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -12,22 +11,14 @@ import {
   LeaderboardTable,
   Toggle,
 } from "@/components";
-import { MAX_CODE_CHARACTERS } from "@/components/code-editor";
-import { useLanguageDetection } from "@/hooks/use-language-detection";
-import { LANGUAGE_OPTIONS, LANGUAGES } from "@/lib/languages";
-
-function getLanguageName(key: string): string {
-  return LANGUAGES[key]?.name ?? key;
-}
+import { MAX_CHARACTERS } from "@/components/code-editor";
 
 export default function Home() {
   const [roastMode, setRoastMode] = useState(true);
   const [code, setCode] = useState("");
-  const [manualLanguage, setManualLanguage] = useState<string | null>(null);
+  const [language, setLanguage] = useState<string | null>(null);
 
-  const { detectedLanguage } = useLanguageDetection(code);
-
-  const isCodeValid = code.length > 0 && code.length <= MAX_CODE_CHARACTERS;
+  const isCodeValid = code.length > 0 && code.length <= MAX_CHARACTERS;
 
   const mockEntries = [
     {
@@ -72,35 +63,12 @@ export default function Home() {
         <CodeEditor
           value={code}
           onChange={setCode}
-          language={manualLanguage ?? undefined}
-          detectedLanguage={detectedLanguage}
-          placeholder="// paste your code here..."
+          language={language}
+          onLanguageChange={setLanguage}
         />
 
         <div className="flex w-[780px] items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="relative flex items-center">
-              <select
-                className="h-8 appearance-none rounded border border-border-primary bg-bg-surface pl-2 pr-8 font-mono text-xs text-text-primary outline-none"
-                value={manualLanguage ?? detectedLanguage ?? ""}
-                onChange={(e) =>
-                  setManualLanguage(e.target.value ? e.target.value : null)
-                }
-              >
-                <option value="">
-                  Auto-detect
-                  {detectedLanguage
-                    ? ` (${getLanguageName(detectedLanguage)})`
-                    : ""}
-                </option>
-                {LANGUAGE_OPTIONS.map((lang) => (
-                  <option key={lang.value} value={lang.value}>
-                    {lang.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-2 h-3 w-3 text-text-tertiary pointer-events-none" />
-            </div>
             <Toggle checked={roastMode} onChange={setRoastMode}>
               <span
                 className={

@@ -1,242 +1,172 @@
 "use client";
 
-import {
-  forwardRef,
-  type TextareaHTMLAttributes,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
-import { tv, type VariantProps } from "tailwind-variants";
+import { ChevronDown } from "lucide-react";
+import { useCallback, useMemo, useRef } from "react";
+import { twMerge } from "tailwind-merge";
+import { LANGUAGE_OPTIONS, LANGUAGES } from "@/lib/languages";
 import { useShikiHighlighter } from "@/hooks/use-shiki-highlighter";
-import { cn } from "@/lib/utils";
 
-const codeEditorVariants = tv({
-  slots: {
-    root: "w-[780px] border border-border-primary bg-bg-input overflow-hidden",
-    header: "flex h-10 w-full items-center border-b border-border-primary px-4",
-    dots: "flex gap-2",
-    content: "relative flex overflow-hidden",
-    lineNumbersContainer:
-      "flex w-12 flex-shrink-0 flex-col border-r border-border-primary bg-bg-surface overflow-y-auto",
-    lineNumber:
-      "font-mono text-xs leading-6 text-text-tertiary h-6 pr-3 text-right",
-    editorWrapper: "relative flex-1 overflow-y-auto",
-    textarea:
-      "absolute inset-0 h-full w-full resize-none bg-transparent px-4 py-4 font-mono text-sm leading-6 text-transparent caret-accent-green outline-none placeholder:text-text-tertiary",
-    highlighted:
-      "pointer-events-none absolute inset-0 overflow-hidden px-4 py-4 font-mono text-sm leading-6 whitespace-pre",
-    languageBadge:
-      "ml-auto rounded-full bg-bg-surface px-2 py-0.5 font-mono text-xs text-text-secondary",
-    footer:
-      "flex h-8 items-center justify-between border-t border-border-primary px-4",
-    charCounter: "font-mono text-xs",
-    charCounterValid: "text-accent-green",
-    charCounterInvalid: "text-accent-red",
-  },
-  variants: {
-    height: {
-      default: "h-[300px]",
-      sm: "h-[300px]",
-      lg: "h-[500px]",
-    },
-  },
-  defaultVariants: {
-    height: "default",
-  },
-});
+const MAX_CHARACTERS = 2000;
 
-const MAX_CODE_LINES = 500;
-export const MAX_CODE_CHARACTERS = 2000;
-
-export interface CodeEditorProps
-  extends Omit<
-      TextareaHTMLAttributes<HTMLTextAreaElement>,
-      "className" | "onChange"
-    >,
-    VariantProps<typeof codeEditorVariants> {
-  showLineNumbers?: boolean;
+type CodeEditorProps = {
+  value: string;
+  onChange: (value: string) => void;
+  language: string | null;
+  onLanguageChange?: (language: string | null) => void;
   className?: string;
-  language?: string;
-  detectedLanguage?: string | null;
-  onLanguageChange?: (lang: string) => void;
-  onChange?: (value: string) => void;
-}
+};
 
-const CodeEditor = forwardRef<HTMLTextAreaElement, CodeEditorProps>(
-  (
-    {
-      className,
-      height,
-      showLineNumbers = true,
-      value,
-      language,
-      detectedLanguage,
-      onChange,
-      onLanguageChange,
-      ...props
-    },
-    ref,
-  ) => {
-    const codeValue = typeof value === "string" ? value : "";
-    const {
-      root,
-      header,
-      dots,
-      content,
-      lineNumbersContainer,
-      lineNumber,
-      editorWrapper,
-      textarea,
-      highlighted,
-      languageBadge,
-      footer,
-      charCounter,
-      charCounterValid,
-      charCounterInvalid,
-    } = codeEditorVariants({ height });
+function CodeEditor({
+  value,
+  onChange,
+  language,
+  onLanguageChange,
+  className,
+}: CodeEditorProps) {
+  const { highlight, isReady } = useShikiHighlighter();
+  const highlightedRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const charCount = codeValue.length;
-    const isValid = charCount <= MAX_CODE_CHARACTERS;
+  const displayLanguage = language
+    ? LANGUAGES[language]?.name ?? language
+    : null;
 
-    const [highlightedHtml, setHighlightedHtml] = useState("");
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const highlightedRef = useRef<HTMLDivElement>(null);
+  const charCount = value.length;
+  const isOverLimit = charCount > MAX_CHARACTERS;
 
-    const { highlight, isReady } = useShikiHighlighter();
+  const lines = value.split("\n");
+  const lineCount = Math.max(lines.length, 16);
 
-    useEffect(() => {
-      if (!codeValue || !isReady) {
-        setHighlightedHtml("");
-        return;
-      }
+  const highlightedHtml = useMemo(() => {
+    if (!isReady || !value) return "";
 
-      const lang = language ?? detectedLanguage ?? "plaintext";
-      const html = highlight(codeValue, lang);
-      setHighlightedHtml(html);
-    }, [codeValue, isReady, language, detectedLanguage, highlight]);
+    const lang = language ?? "javascript";
+    return highlight(value, lang);
+  }, [value, language, isReady, highlight]);
 
-    const handleScroll = useCallback(
-      (e: React.UIEvent<HTMLTextAreaElement>) => {
-        if (highlightedRef.current) {
-          highlightedRef.current.scrollTop = e.currentTarget.scrollTop;
-          highlightedRef.current.scrollLeft = e.currentTarget.scrollLeft;
-        }
-      },
-      [],
-    );
+  const hasHighlight = isReady && highlightedHtml.length > 0;
 
-    const handleChange = useCallback(
-      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const lines = e.target.value.split("\n").length;
-        if (lines > MAX_CODE_LINES) {
-          const truncated = e.target.value
-            .split("\n")
-            .slice(0, MAX_CODE_LINES)
-            .join("\n");
-          onChange?.(truncated);
-        } else {
-          onChange?.(e.target.value);
-        }
-      },
-      [onChange],
-    );
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
 
-    const lineCount = codeValue?.split("\n").length || 1;
-    const lines = Array.from({ length: lineCount }, (_, i) => i + 1);
+  const handleScroll = useCallback(() => {
+    const textarea = textareaRef.current;
+    const highlighted = highlightedRef.current;
+    const lineNumbers = lineNumbersRef.current;
+    if (!textarea) return;
 
-    const handleLineNumbersScroll = useCallback(
-      (e: React.UIEvent<HTMLDivElement>) => {
-        if (highlightedRef.current) {
-          highlightedRef.current.scrollTop = e.currentTarget.scrollTop;
-        }
-        if (textareaRef.current) {
-          textareaRef.current.scrollTop = e.currentTarget.scrollTop;
-        }
-      },
-      [],
-    );
+    if (highlighted) {
+      highlighted.scrollTop = textarea.scrollTop;
+      highlighted.scrollLeft = textarea.scrollLeft;
+    }
+    if (lineNumbers) {
+      lineNumbers.scrollTop = textarea.scrollTop;
+    }
+  }, []);
 
-    const displayLang = language ?? detectedLanguage;
-    const langName = displayLang
-      ? displayLang.charAt(0).toUpperCase() + displayLang.slice(1)
-      : null;
+  return (
+    <div
+      className={twMerge(
+        "border border-border-primary overflow-hidden flex flex-col",
+        className,
+      )}
+    >
+      <div className="flex items-center gap-2 h-10 px-4 border-b border-border-primary">
+        <span className="size-3 rounded-full bg-accent-red" />
+        <span className="size-3 rounded-full bg-accent-amber" />
+        <span className="size-3 rounded-full bg-accent-green" />
+        <span className="flex-1" />
 
-    return (
-      <div className={cn(root({ className }))}>
-        <div className={header()}>
-          <div className={dots()}>
-            <span className="h-3 w-3 rounded-full bg-accent-red" />
-            <span className="h-3 w-3 rounded-full bg-accent-amber" />
-            <span className="h-3 w-3 rounded-full bg-accent-green" />
-          </div>
-          {langName && <span className={languageBadge()}>{langName}</span>}
-        </div>
-
-        <div className={cn(content(), editorWrapper(), root({ height }))}>
-          {showLineNumbers && (
-            <div
-              className={lineNumbersContainer()}
-              onScroll={handleLineNumbersScroll}
-            >
-              {lines.map((line) => (
-                <span key={line} className={lineNumber()}>
-                  {line}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="relative flex-1">
-            <div
-              ref={highlightedRef}
-              className={highlighted()}
-              dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-            />
-            <textarea
-              ref={(node) => {
-                if (typeof ref === "function") {
-                  ref(node);
-                } else if (ref) {
-                  ref.current = node;
-                }
-                (
-                  textareaRef as React.MutableRefObject<HTMLTextAreaElement | null>
-                ).current = node;
-              }}
-              className={cn(
-                textarea(),
-                showLineNumbers && "w-[calc(100%-48px)]",
-              )}
-              placeholder="// paste your code here..."
-              value={codeValue}
-              onChange={handleChange}
-              onScroll={handleScroll}
-              spellCheck={false}
-              {...props}
-            />
-          </div>
-        </div>
-
-        <div className={footer()}>
-          <span />
-          <span
-            className={cn(
-              charCounter(),
-              isValid ? charCounterValid() : charCounterInvalid(),
-            )}
+        <div className="relative flex items-center">
+          <select
+            value={language ?? "auto"}
+            onChange={(e) => {
+              const val = e.target.value;
+              onLanguageChange?.(val === "auto" ? null : val);
+            }}
+            className="bg-transparent font-mono text-xs text-text-secondary outline-none cursor-pointer appearance-none hover:text-text-primary transition-colors pr-5"
           >
-            {charCount.toLocaleString()} /{" "}
-            {MAX_CODE_CHARACTERS.toLocaleString()} chars
-          </span>
+            <option
+              value="auto"
+              className="bg-bg-surface text-text-primary"
+            >
+              {displayLanguage
+                ? `${displayLanguage} (detected)`
+                : "auto-detect"}
+            </option>
+            {LANGUAGE_OPTIONS.map((opt) => (
+              <option
+                key={opt.value}
+                value={opt.value}
+                className="bg-bg-surface text-text-primary"
+              >
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-0 size-3.5 text-text-tertiary pointer-events-none" />
         </div>
       </div>
-    );
-  },
-);
 
-CodeEditor.displayName = "CodeEditor";
+      <div className="flex flex-1 bg-bg-input max-h-96 overflow-hidden">
+        <div
+          ref={lineNumbersRef}
+          className="flex flex-col items-end gap-0 py-4 px-3 w-12 border-r border-border-primary bg-bg-surface select-none overflow-hidden"
+        >
+          {Array.from({ length: lineCount }, (_, i) => (
+            <span
+              // biome-ignore lint/suspicious/noArrayIndexKey: line numbers are index-based and never reorder
+              key={i}
+              className="font-mono text-xs leading-[1.625] text-text-tertiary"
+            >
+              {i + 1}
+            </span>
+          ))}
+        </div>
 
-export { CodeEditor, codeEditorVariants };
+        <div className="relative flex-1 min-h-80">
+          {hasHighlight && (
+            <div
+              ref={highlightedRef}
+              aria-hidden="true"
+              className="absolute inset-0 py-4 px-4 font-mono text-xs leading-[1.625] overflow-hidden whitespace-pre pointer-events-none [tab-size:2] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent [&_.line]:leading-[1.625]"
+              dangerouslySetInnerHTML={{
+                __html: highlightedHtml,
+              }}
+            />
+          )}
+
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onScroll={handleScroll}
+            placeholder="// paste your code here..."
+            spellCheck={false}
+            autoCapitalize="off"
+            autoComplete="off"
+            autoCorrect="off"
+            className={twMerge(
+              "relative z-10 w-full h-full py-4 px-4 bg-transparent font-mono text-xs leading-[1.625] outline-none resize-none min-h-80 whitespace-pre overflow-auto [tab-size:2]",
+              hasHighlight
+                ? "text-transparent caret-accent-green selection:bg-white/10"
+                : "text-text-primary placeholder:text-text-tertiary caret-accent-green",
+            )}
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end h-8 px-4 border-t border-border-primary">
+        <span
+          className={twMerge(
+            "font-mono text-[10px] tabular-nums",
+            isOverLimit ? "text-accent-red" : "text-text-tertiary",
+          )}
+        >
+          {charCount.toLocaleString()}/{MAX_CHARACTERS.toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export { CodeEditor, MAX_CHARACTERS, type CodeEditorProps };

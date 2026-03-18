@@ -1,5 +1,5 @@
 export { CodeBlock } from "./code-block";
-export { CodeEditor, codeEditorVariants } from "./code-editor";
+export { CodeEditor, MAX_CHARACTERS, type CodeEditorProps } from "./code-editor";
 export type { CodeWindowProps } from "./code-window";
 export {
   CodeWindow,
