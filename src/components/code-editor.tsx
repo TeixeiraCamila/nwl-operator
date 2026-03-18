@@ -142,7 +142,7 @@ function CodeEditor({
             onScroll={handleScroll}
             placeholder="// paste your code here..."
             spellCheck={false}
-            autoCapitalize="off"
+            autoCapitalize="none"
             autoComplete="off"
             autoCorrect="off"
             className={twMerge(
@@ -162,7 +162,7 @@ function CodeEditor({
             isOverLimit ? "text-accent-red" : "text-text-tertiary",
           )}
         >
-          {charCount.toLocaleString()}/{MAX_CHARACTERS.toLocaleString()}
+          {charCount.toLocaleString("en-US")}/{MAX_CHARACTERS.toLocaleString("en-US")}
         </span>
       </div>
     </div>

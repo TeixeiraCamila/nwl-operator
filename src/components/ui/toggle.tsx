@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type HTMLAttributes, useCallback, useState } from "react";
+import { forwardRef, type ComponentProps, useCallback, useState } from "react";
 
 import { tv, type VariantProps } from "tailwind-variants";
 
@@ -28,14 +28,14 @@ const toggleVariants = tv({
 });
 
 export interface ToggleProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onChange">,
+  extends Omit<ComponentProps<"label">, "onChange">,
     VariantProps<typeof toggleVariants> {
   checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
-const ToggleRoot = forwardRef<HTMLButtonElement, ToggleProps>(
+const ToggleRoot = forwardRef<HTMLLabelElement, ToggleProps>(
   (
     {
       className,
@@ -63,18 +63,12 @@ const ToggleRoot = forwardRef<HTMLButtonElement, ToggleProps>(
     const { root, indicator, thumb } = toggleVariants({ size });
 
     return (
-      <label className={cn(root({ className }))}>
-        <button
-          ref={ref}
-          type="button"
-          role="switch"
-          aria-checked={isChecked}
-          onClick={handleClick}
+      <label ref={ref} className={cn(root({ className }))} onClick={handleClick}>
+        <span
           className={cn(
             indicator(),
             isChecked ? "bg-accent-green" : "bg-border-primary",
           )}
-          {...props}
         >
           <span
             className={cn(
@@ -84,7 +78,7 @@ const ToggleRoot = forwardRef<HTMLButtonElement, ToggleProps>(
                 : "translate-x-[3px] bg-zinc-400",
             )}
           />
-        </button>
+        </span>
         {children !== undefined && <span>{children}</span>}
       </label>
     );
@@ -93,47 +87,6 @@ const ToggleRoot = forwardRef<HTMLButtonElement, ToggleProps>(
 
 ToggleRoot.displayName = "ToggleRoot";
 
-export interface ToggleIndicatorProps extends HTMLAttributes<HTMLSpanElement> {
-  checked?: boolean;
-}
+const Toggle = ToggleRoot;
 
-const ToggleIndicator = forwardRef<HTMLSpanElement, ToggleIndicatorProps>(
-  ({ className, checked, ...props }, ref) => {
-    const { thumb } = toggleVariants();
-
-    return (
-      <span
-        ref={ref}
-        className={cn(
-          thumb(),
-          checked
-            ? "translate-x-[18px] bg-white"
-            : "translate-x-[3px] bg-zinc-400",
-          className,
-        )}
-        {...props}
-      />
-    );
-  },
-);
-
-ToggleIndicator.displayName = "ToggleIndicator";
-
-export interface ToggleLabelProps extends HTMLAttributes<HTMLSpanElement> {}
-
-const ToggleLabel = forwardRef<HTMLSpanElement, ToggleLabelProps>(
-  ({ className, ...props }, ref) => {
-    const { label } = toggleVariants();
-
-    return <span ref={ref} className={cn(label({ className }))} {...props} />;
-  },
-);
-
-ToggleLabel.displayName = "ToggleLabel";
-
-const Toggle = Object.assign(ToggleRoot, {
-  Indicator: ToggleIndicator,
-  Label: ToggleLabel,
-});
-
-export { Toggle, ToggleIndicator, ToggleLabel, ToggleRoot, toggleVariants };
+export { Toggle, ToggleRoot, toggleVariants };

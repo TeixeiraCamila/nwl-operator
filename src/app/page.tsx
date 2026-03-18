@@ -12,11 +12,14 @@ import {
   Toggle,
 } from "@/components";
 import { MAX_CHARACTERS } from "@/components/code-editor";
+import { useLanguageDetection } from "@/hooks/use-language-detection";
 
 export default function Home() {
   const [roastMode, setRoastMode] = useState(true);
   const [code, setCode] = useState("");
-  const [language, setLanguage] = useState<string | null>(null);
+  const [manualLanguage, setManualLanguage] = useState<string | null>(null);
+  const { detectedLanguage } = useLanguageDetection(code);
+  const language = manualLanguage ?? detectedLanguage;
 
   const isCodeValid = code.length > 0 && code.length <= MAX_CHARACTERS;
 
@@ -64,7 +67,8 @@ export default function Home() {
           value={code}
           onChange={setCode}
           language={language}
-          onLanguageChange={setLanguage}
+          onLanguageChange={setManualLanguage}
+          className="w-full max-w-3xl"
         />
 
         <div className="flex w-[780px] items-center justify-between gap-4">

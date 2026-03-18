@@ -131,11 +131,14 @@ export default function ExamplesPage() {
           <p className="font-mono text-sm text-text-secondary">
             Card component for code analysis
           </p>
-          <AnalysisCard
-            severity="critical"
-            title="using var instead of const/let"
-            description="the var keyword is function-scoped rather than block-scoped, which can lead to unexpected behavior and bugs."
-          />
+          <AnalysisCard severity="critical">
+            <AnalysisCard.Badge severity="critical" />
+            <AnalysisCard.Title>using var instead of const/let</AnalysisCard.Title>
+            <AnalysisCard.Description>
+              the var keyword is function-scoped rather than block-scoped, which
+              can lead to unexpected behavior and bugs.
+            </AnalysisCard.Description>
+          </AnalysisCard>
         </section>
 
         {/* Code Block */}
@@ -154,7 +157,7 @@ export default function ExamplesPage() {
           <CodeBlock
             code={codeExample}
             lang="javascript"
-            filename="calculate.js"
+            languageName="JavaScript"
           />
         </section>
 
@@ -213,9 +216,18 @@ export default function ExamplesPage() {
             Circular score indicator
           </p>
           <div className="flex flex-wrap items-center gap-8">
-            <ScoreRing score={85} label="Score" />
-            <ScoreRing score={45} label="Score" />
-            <ScoreRing score={15} label="Score" />
+            <ScoreRing score={85}>
+              <ScoreRing.Value>85</ScoreRing.Value>
+              <ScoreRing.Label>Score</ScoreRing.Label>
+            </ScoreRing>
+            <ScoreRing score={45}>
+              <ScoreRing.Value>45</ScoreRing.Value>
+              <ScoreRing.Label>Score</ScoreRing.Label>
+            </ScoreRing>
+            <ScoreRing score={15}>
+              <ScoreRing.Value>15</ScoreRing.Value>
+              <ScoreRing.Label>Score</ScoreRing.Label>
+            </ScoreRing>
           </div>
         </section>
       </div>

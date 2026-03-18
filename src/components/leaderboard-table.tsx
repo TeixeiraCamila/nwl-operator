@@ -3,6 +3,7 @@ import { forwardRef, type HTMLAttributes } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
 import { cn } from "@/lib/utils";
+import { CodePreview } from "./code-preview";
 
 const leaderboardTableVariants = tv({
   slots: {
@@ -42,6 +43,7 @@ export interface LeaderboardTableProps
     code: string | string[];
     lang: string;
   }[];
+  useCodePreview?: boolean;
 }
 
 const defaultEntries = [
@@ -74,7 +76,7 @@ const defaultEntries = [
 ];
 
 const LeaderboardTableRoot = forwardRef<HTMLDivElement, LeaderboardTableProps>(
-  ({ className, size, entries = defaultEntries, children, ...props }, ref) => {
+  ({ className, size, entries = defaultEntries, useCodePreview, children, ...props }, ref) => {
     const {
       root,
       header,
@@ -90,7 +92,11 @@ const LeaderboardTableRoot = forwardRef<HTMLDivElement, LeaderboardTableProps>(
       lang,
     } = leaderboardTableVariants({ size });
 
-    const renderCode = (codeValue: string | string[]) => {
+    const renderCode = (codeValue: string | string[], codeLang: string) => {
+      if (useCodePreview) {
+        return <CodePreview code={codeValue} lang={codeLang} />;
+      }
+
       const lines = Array.isArray(codeValue) ? codeValue : [codeValue];
       return lines.map((line) => (
         <span
@@ -125,10 +131,10 @@ const LeaderboardTableRoot = forwardRef<HTMLDivElement, LeaderboardTableProps>(
                 {entry.rank}
               </span>
               <span className={score()}>{entry.score}</span>
-              <span className={cn(code(), "flex-col gap-[3px]")}>
-                {renderCode(entry.code)}
+              <span className={cn(code(), useCodePreview ? "w-full" : "flex-col gap-[3px]")}>
+                {renderCode(entry.code, entry.lang)}
               </span>
-              <span className={lang()}>{entry.lang}</span>
+              {!useCodePreview && <span className={lang()}>{entry.lang}</span>}
             </div>
           ))}
       </div>

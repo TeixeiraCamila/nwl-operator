@@ -1,8 +1,4 @@
-import {
-  forwardRef,
-  type HTMLAttributes,
-  type TextareaHTMLAttributes,
-} from "react";
+import { forwardRef, type HTMLAttributes, type TextareaHTMLAttributes } from "react";
 
 import { tv, type VariantProps } from "tailwind-variants";
 
@@ -103,102 +99,12 @@ const CodeWindow = forwardRef<HTMLTextAreaElement, CodeWindowProps>(
 
 CodeWindow.displayName = "CodeWindow";
 
-export interface CodeWindowHeaderProps extends HTMLAttributes<HTMLDivElement> {}
-
-const CodeWindowHeader = forwardRef<HTMLDivElement, CodeWindowHeaderProps>(
-  ({ className, ...props }, ref) => {
-    const { header, dots } = codeWindowVariants();
-
-    return (
-      <div ref={ref} className={cn(header({ className }))} {...props}>
-        <div className={dots()}>
-          <span className="h-3 w-3 rounded-full bg-accent-red" />
-          <span className="h-3 w-3 rounded-full bg-accent-amber" />
-          <span className="h-3 w-3 rounded-full bg-accent-green" />
-        </div>
-      </div>
-    );
-  },
-);
-
-CodeWindowHeader.displayName = "CodeWindowHeader";
-
-export interface CodeWindowContentProps extends HTMLAttributes<HTMLDivElement> {
-  showLineNumbers?: boolean;
-  lineCount?: number;
-}
-
-const CodeWindowContent = forwardRef<HTMLDivElement, CodeWindowContentProps>(
-  (
-    { className, showLineNumbers = true, lineCount = 10, children, ...props },
-    ref,
-  ) => {
-    const { content, lineNumbers, lineNumber, textarea } = codeWindowVariants();
-
-    const lines = Array.from({ length: lineCount }, (_, i) => i + 1);
-
-    return (
-      <div ref={ref} className={cn(content({ className }))} {...props}>
-        {showLineNumbers && (
-          <div className={lineNumbers()}>
-            {lines.map((line) => (
-              <span key={line} className={lineNumber()}>
-                {line}
-              </span>
-            ))}
-          </div>
-        )}
-        {children || (
-          <textarea
-            className={cn(textarea(), showLineNumbers && "w-[calc(100%-48px)]")}
-            placeholder="// paste your code here..."
-          />
-        )}
-      </div>
-    );
-  },
-);
-
-CodeWindowContent.displayName = "CodeWindowContent";
-
-export interface CodeWindowLineNumbersProps
-  extends HTMLAttributes<HTMLDivElement> {
-  lineCount?: number;
-}
-
-const CodeWindowLineNumbers = forwardRef<
-  HTMLDivElement,
-  CodeWindowLineNumbersProps
->(({ className, lineCount = 10, ...props }, ref) => {
-  const { lineNumbers, lineNumber } = codeWindowVariants();
-
-  const lines = Array.from({ length: lineCount }, (_, i) => i + 1);
-
-  return (
-    <div ref={ref} className={cn(lineNumbers({ className }))} {...props}>
-      {lines.map((line) => (
-        <span key={line} className={lineNumber()}>
-          {line}
-        </span>
-      ))}
-    </div>
-  );
-});
-
-CodeWindowLineNumbers.displayName = "CodeWindowLineNumbers";
-
 const CodeWindowCompound = Object.assign(CodeWindow, {
   Root: CodeWindowRoot,
-  Header: CodeWindowHeader,
-  Content: CodeWindowContent,
-  LineNumbers: CodeWindowLineNumbers,
 });
 
 export {
-  CodeWindowCompound as CodeWindow,
-  CodeWindowContent,
-  CodeWindowHeader,
-  CodeWindowLineNumbers,
+  CodeWindowCompound,
   CodeWindowRoot,
   codeWindowVariants,
 };

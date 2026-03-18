@@ -2,10 +2,7 @@ export { CodeBlock } from "./code-block";
 export { CodeEditor, MAX_CHARACTERS, type CodeEditorProps } from "./code-editor";
 export type { CodeWindowProps } from "./code-window";
 export {
-  CodeWindow,
-  CodeWindowContent,
-  CodeWindowHeader,
-  CodeWindowLineNumbers,
+  CodeWindowCompound,
   CodeWindowRoot,
   codeWindowVariants,
 } from "./code-window";
@@ -79,10 +76,4 @@ export {
   scoreRingVariants,
 } from "./ui/score-ring";
 export type { ToggleProps } from "./ui/toggle";
-export {
-  Toggle,
-  ToggleIndicator,
-  ToggleLabel,
-  ToggleRoot,
-  toggleVariants,
-} from "./ui/toggle";
+export { Toggle, ToggleRoot, toggleVariants } from "./ui/toggle";

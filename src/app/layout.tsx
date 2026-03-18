@@ -35,14 +35,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <Navbar>
-          <div className="flex items-center gap-2 teste">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <span className="font-mono text-xl font-bold text-accent-green">
               {" > "}
             </span>
             <span className="font-mono text-lg font-medium text-text-primary">
               devroast
             </span>
-          </div>
+          </Link>
           <div className="flex items-center gap-6">
             <Link
               href="/leaderboard"

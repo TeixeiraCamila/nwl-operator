@@ -81,15 +81,6 @@ export default function LeaderboardPage() {
           ))}
         </div>
 
-        <FooterHint>
-          <FooterHint.Item>2,847 submissions</FooterHint.Item>
-          <FooterHint.Separator />
-          <FooterHint.Item>avg score: 4.2/10</FooterHint.Item>
-        </FooterHint>
-
-        <Link href="/">
-          <Button variant="default">$ roast_my_code</Button>
-        </Link>
 
         <div className="h-16" />
       </div>
