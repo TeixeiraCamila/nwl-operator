@@ -1,19 +1,33 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import {
   Button,
-  CodeWindow,
+  CodeEditor,
   FooterHint,
   Hero,
   LeaderboardPreview,
   LeaderboardTable,
   Toggle,
 } from "@/components";
+import { MAX_CODE_CHARACTERS } from "@/components/code-editor";
+import { useLanguageDetection } from "@/hooks/use-language-detection";
+import { LANGUAGE_OPTIONS, LANGUAGES } from "@/lib/languages";
+
+function getLanguageName(key: string): string {
+  return LANGUAGES[key]?.name ?? key;
+}
 
 export default function Home() {
   const [roastMode, setRoastMode] = useState(true);
   const [code, setCode] = useState("");
+  const [manualLanguage, setManualLanguage] = useState<string | null>(null);
+
+  const { detectedLanguage } = useLanguageDetection(code);
+
+  const isCodeValid = code.length > 0 && code.length <= MAX_CODE_CHARACTERS;
 
   const mockEntries = [
     {
@@ -46,7 +60,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-bg-page px-10 py-10">
-      <div className="flex w-full max-w-5xl flex-col gap-8">
+      <div className="flex w-full max-w-5xl flex-col gap-8 items-center">
         <Hero>
           <Hero.Title prefix="> ">paste your code. get roasted.</Hero.Title>
           <Hero.Description>
@@ -55,14 +69,38 @@ export default function Home() {
           </Hero.Description>
         </Hero>
 
-        <CodeWindow
+        <CodeEditor
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={setCode}
+          language={manualLanguage ?? undefined}
+          detectedLanguage={detectedLanguage}
           placeholder="// paste your code here..."
         />
 
         <div className="flex w-[780px] items-center justify-between gap-4">
           <div className="flex items-center gap-4">
+            <div className="relative flex items-center">
+              <select
+                className="h-8 appearance-none rounded border border-border-primary bg-bg-surface pl-2 pr-8 font-mono text-xs text-text-primary outline-none"
+                value={manualLanguage ?? detectedLanguage ?? ""}
+                onChange={(e) =>
+                  setManualLanguage(e.target.value ? e.target.value : null)
+                }
+              >
+                <option value="">
+                  Auto-detect
+                  {detectedLanguage
+                    ? ` (${getLanguageName(detectedLanguage)})`
+                    : ""}
+                </option>
+                {LANGUAGE_OPTIONS.map((lang) => (
+                  <option key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2 h-3 w-3 text-text-tertiary pointer-events-none" />
+            </div>
             <Toggle checked={roastMode} onChange={setRoastMode}>
               <span
                 className={
@@ -76,7 +114,9 @@ export default function Home() {
               maximum sarcasm enabled
             </span>
           </div>
-          <Button variant="default">$ roast_my_code</Button>
+          <Button variant="default" disabled={!isCodeValid}>
+            $ roast_my_code
+          </Button>
         </div>
 
         <FooterHint>
@@ -92,9 +132,11 @@ export default function Home() {
             <LeaderboardPreview.Title>
               shame_leaderboard
             </LeaderboardPreview.Title>
-            <Button variant="ghost" size="sm">
-              $ view_all &gt;&gt;
-            </Button>
+            <Link href="/leaderboard">
+              <Button variant="ghost" size="sm">
+                $ view_all &gt;&gt;
+              </Button>
+            </Link>
           </LeaderboardPreview.Header>
           <LeaderboardPreview.Description>
             the worst code on the internet, ranked by shame

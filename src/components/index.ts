@@ -1,4 +1,5 @@
 export { CodeBlock } from "./code-block";
+export { CodeEditor, codeEditorVariants } from "./code-editor";
 export type { CodeWindowProps } from "./code-window";
 export {
   CodeWindow,
@@ -8,6 +9,11 @@ export {
   CodeWindowRoot,
   codeWindowVariants,
 } from "./code-window";
+export type { LeaderboardEntryProps } from "./leaderboard-entry";
+export {
+  LeaderboardEntry,
+  leaderboardEntryVariants,
+} from "./leaderboard-entry";
 export type { LeaderboardTableProps } from "./leaderboard-table";
 export {
   LeaderboardTable,

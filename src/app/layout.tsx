@@ -45,7 +45,7 @@ export default function RootLayout({
           </div>
           <div className="flex items-center gap-6">
             <Link
-              href="/examples"
+              href="/leaderboard"
               className="font-mono text-sm text-text-secondary hover:text-text-primary"
             >
               leaderboard
