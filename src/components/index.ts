@@ -64,6 +64,8 @@ export type { ButtonProps } from "./ui/button";
 export { Button, buttonVariants } from "./ui/button";
 export type { DiffLineProps, DiffLineVariants } from "./ui/diff-line";
 export { DiffLine, diffLine } from "./ui/diff-line";
+export type { DiffBlockProps, DiffBlockHeaderProps } from "./ui/diff-block";
+export { DiffBlock, DiffBlockHeader } from "./ui/diff-block";
 export type { ScoreRingProps } from "./ui/score-ring";
 export { ScoreRing } from "./ui/score-ring";
 export type { ToggleProps } from "./ui/toggle";

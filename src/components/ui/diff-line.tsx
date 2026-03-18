@@ -16,12 +16,12 @@ const diffLine = tv({
 });
 
 const diffPrefix = tv({
-  base: "select-none shrink-0",
+  base: "select-none shrink-0 w-5 text-right",
   variants: {
     type: {
       added: "text-accent-green",
       removed: "text-accent-red",
-      context: "text-text-tertiary",
+      context: "text-transparent",
     },
   },
   defaultVariants: {
@@ -33,8 +33,8 @@ const diffContent = tv({
   base: "",
   variants: {
     type: {
-      added: "text-text-primary",
-      removed: "text-text-secondary",
+      added: "text-accent-green",
+      removed: "text-accent-red",
       context: "text-text-secondary",
     },
   },

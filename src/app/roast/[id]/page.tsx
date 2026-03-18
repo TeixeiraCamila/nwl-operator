@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CodeBlock, CodeBlockHeader } from "@/components/code-block";
 import { Badge } from "@/components/ui/badge";
+import { DiffBlock } from "@/components/ui/diff-block";
+import { DiffLine } from "@/components/ui/diff-line";
 import { Button } from "@/components/ui/button";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { LANGUAGES } from "@/lib/languages";
@@ -18,6 +20,10 @@ const STATIC_CODE = `function calculateTotal(items) {
     }
   }
   return total;
+}`;
+
+const STATIC_SUGGESTED_FIX = `function calculateTotal(items) {
+  return items.reduce((sum, item) => sum + item.price, 0);
 }`;
 
 const STATIC_ANALYSES = [
@@ -47,6 +53,37 @@ const STATIC_ANALYSES = [
   },
 ] as const;
 
+type DiffLineType = "added" | "removed" | "context";
+
+function computeDiffLines(
+  original: string,
+  suggested: string,
+): Array<{ type: DiffLineType; content: string }> {
+  const originalLines = original.split("\n");
+  const suggestedLines = suggested.split("\n");
+  const lines: Array<{ type: DiffLineType; content: string }> = [];
+
+  const maxLen = Math.max(originalLines.length, suggestedLines.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    const orig = originalLines[i];
+    const sugg = suggestedLines[i];
+
+    if (orig === sugg) {
+      lines.push({ type: "context", content: orig ?? "" });
+    } else {
+      if (orig !== undefined) {
+        lines.push({ type: "removed", content: orig });
+      }
+      if (sugg !== undefined) {
+        lines.push({ type: "added", content: sugg });
+      }
+    }
+  }
+
+  return lines;
+}
+
 function getScoreColor(score: number) {
   if (score >= 7) return "accent-green";
   if (score >= 4) return "accent-amber";
@@ -61,7 +98,8 @@ function getVerdict(score: number) {
 
 function getRoastMessage(score: number) {
   if (score >= 7) return '"not bad... but we have notes."';
-  if (score >= 4) return '"this code walks so future maintainers can run... away from it."';
+  if (score >= 4)
+    return '"this code walks so future maintainers can run... away from it."';
   return '"this code looks like it was written during a power outage... in 2005."';
 }
 
@@ -76,6 +114,7 @@ export default async function RoastResultPage({
   const scoreColor = getScoreColor(overallScore);
   const verdict = getVerdict(overallScore);
   const roastMessage = getRoastMessage(overallScore);
+  const diffLines = computeDiffLines(STATIC_CODE, STATIC_SUGGESTED_FIX);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-bg-page px-10 py-10">
@@ -146,7 +185,26 @@ export default async function RoastResultPage({
             </span>
           </div>
 
-          <CodeBlock code={STATIC_CODE} lang={lang} filename={languageName} />
+          <CodeBlock code={STATIC_CODE} lang={lang} />
+        </div>
+
+        <div className="flex w-full max-w-3xl flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm font-bold text-accent-green">
+              {"//"}
+            </span>
+            <span className="font-mono text-sm font-bold text-text-primary">
+              suggested_fix
+            </span>
+          </div>
+
+          <DiffBlock from={`your_code.${lang}`} to={`improved_code.${lang}`}>
+            {diffLines.map((line, i) => (
+              <DiffLine key={`diff-${i}`} type={line.type}>
+                {line.content}
+              </DiffLine>
+            ))}
+          </DiffBlock>
         </div>
 
         <div className="flex w-full max-w-3xl items-center justify-between">
