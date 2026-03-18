@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 const scoreRingVariants = tv({
   slots: {
     root: "relative flex items-center justify-center",
-    value: "font-mono text-2xl font-bold text-text-primary",
-    label: "font-mono text-xs text-text-secondary",
+    value: "font-mono text-5xl font-bold text-text-primary",
+    label: "font-mono text-base text-text-secondary",
   },
   variants: {
     size: {
