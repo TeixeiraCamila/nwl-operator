@@ -1,6 +1,6 @@
 import { FooterHint } from "@/components/sections/footer-hint";
-import { createCaller } from "@/trpc/server";
 import { createTRPCContext } from "@/trpc/init";
+import { createCaller } from "@/trpc/server";
 import { StatsValue } from "./stats-value";
 
 interface StatsMetricsProps {
@@ -8,13 +8,17 @@ interface StatsMetricsProps {
 }
 
 export async function StatsMetrics({ className }: StatsMetricsProps) {
-  let stats;
+  let stats: { totalRoasts: number; avgScore: number } = {
+    totalRoasts: 0,
+    avgScore: 0,
+  };
 
   try {
     const caller = createCaller(await createTRPCContext());
-    stats = await caller.roast.getStats();
+    const data = await caller.roast.getShameLeaderboard({ limit: 0 });
+    stats = { totalRoasts: data.totalRoasts, avgScore: data.avgScore };
   } catch {
-    stats = { totalRoasts: 0, avgScore: 0 };
+    // Keep default values
   }
 
   return (
@@ -24,7 +28,8 @@ export async function StatsMetrics({ className }: StatsMetricsProps) {
       </FooterHint.Item>
       <FooterHint.Separator />
       <FooterHint.Item>
-        avg score: <StatsValue value={stats.avgScore} decimals={1} suffix="/10" />
+        avg score:{" "}
+        <StatsValue value={stats.avgScore} decimals={1} suffix="/10" />
       </FooterHint.Item>
     </FooterHint>
   );

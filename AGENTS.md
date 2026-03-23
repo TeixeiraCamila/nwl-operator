@@ -1,43 +1,62 @@
-# devroast - NLW Operator
+# devroast — NLW Operator
 
 ## Stack
+
 - **Framework**: Next.js 15 (App Router)
 - **UI**: React 19, Tailwind CSS 4
-- **Linguagem**: TypeScript
-- **Estilização**: tailwind-variants + tailwind-merge
+- **Language**: TypeScript
+- **Styling**: tailwind-variants + tailwind-merge
 - **Code Highlighting**: Shiki
+- **API**: tRPC v11 + TanStack Query v5
+- **ORM**: Drizzle + PostgreSQL
 
 ## Scripts
+
 ```bash
-npm run dev      # Desenvolvimento
-npm run build    # Build de produção
-npm run lint     # Verificar código
-npm run format   # Formatar código
+npm run dev      # Development
+npm run build    # Production build
+npm run lint     # Lint code
+npm run format   # Format code
+npm run db:seed  # Seed database
 ```
 
-## Estrutura
+## File Structure
+
 ```
 src/
-├── app/              # Next.js App Router
+├── app/              # Next.js App Router (pages, layouts, API routes)
 ├── components/
-│   ├── ui/           # Componentes reutilizáveis
-│   └── sections/     # Componentes de página
-└── lib/              # Utilitários
+│   ├── ui/           # Reusable UI components (Button, Badge, etc)
+│   ├── sections/     # Page section components (Hero, FooterHint, etc)
+│   └── *.tsx         # Root-level shared components
+├── db/               # Drizzle ORM (schema, client, seed)
+├── hooks/            # Custom React hooks
+├── lib/              # Utilities (cn(), languages, etc)
+└── trpc/             # tRPC v11 + TanStack Query v5 (see src/trpc/AGENTS.md)
 ```
 
-## Padrões
+## Conventions
 
-### Componentes UI
-- Local: `src/components/ui/`
-- Usar `cn()` para merge de classes
-- Composição via sub-componentes (Compound Components)
+### Naming
 
-### Componentes de Sessão
-- Local: `src/components/sections/`
-- Hero, FooterHint, LeaderboardPreview
-- Seguem padrão compound components
+| Type | Convention | Example |
+|------|------------|---------|
+| React Components | PascalCase | `CodePreview.tsx`, `Hero.tsx` |
+| Hooks | camelCase with `use` prefix | `useShikiHighlighter.ts` |
+| Utilities | camelCase or kebab-case | `utils.ts`, `query-client.ts` |
+| tRPC Routers | kebab-case | `roast.ts`, `leaderboard.ts` |
 
-### Convenções
-- **Nomeclatura**: CamelCase para componentes
-- **Export**: Sempre named exports
-- **Estilização**: Classes Tailwind (ex: `gap-2`, não `gap-[8px]`)
+### Exports
+
+- **Always use named exports** — no default exports
+- Components exported from `src/components/ui/index.ts` and `src/components/sections/index.ts`
+
+### Styling
+
+- Use Tailwind classes (e.g., `gap-2`, not `gap-[8px]`)
+- Use `cn()` from `@/lib/utils` for class merging
+- UI components follow compound component pattern
+
+## Additional Documentation
+
+- **tRPC patterns**: See `src/trpc/AGENTS.md`

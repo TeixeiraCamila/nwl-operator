@@ -1,44 +1,13 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { Button, Hero } from "@/components";
+import { LeaderboardPreview } from "@/components/sections/leaderboard-preview";
 import {
-  Button,
-  CodeEditor,
-  Hero,
-  LeaderboardPreview,
-  LeaderboardTable,
-  Toggle,
-} from "@/components";
-import { MAX_CHARACTERS } from "@/components/code-editor";
+  ShameLeaderboard,
+  ShameLeaderboardSkeleton,
+} from "@/components/shame-leaderboard";
 import { StatsMetrics } from "@/components/stats-metrics";
 import { HomeClient } from "./home-client";
-
-const mockEntries = [
-  {
-    rank: 1,
-    score: 1.2,
-    code: [
-      'eval(prompt("enter code"))',
-      "document.write(response)",
-      "// trust the user lol",
-    ],
-    lang: "javascript",
-  },
-  {
-    rank: 2,
-    score: 1.8,
-    code: [
-      "if (x == true) { return true; }",
-      "else if (x == false) { return false; }",
-      "else { return !false; }",
-    ],
-    lang: "typescript",
-  },
-  {
-    rank: 3,
-    score: 2.1,
-    code: ["SELECT * FROM users WHERE 1=1", "-- TODO: add authentication"],
-    lang: "sql",
-  },
-];
 
 export default function Home() {
   return (
@@ -47,8 +16,8 @@ export default function Home() {
         <Hero>
           <Hero.Title prefix="> ">paste your code. get roasted.</Hero.Title>
           <Hero.Description>
-            drop your code below and we&apos;ll rate it — brutally honest or full
-            roast mode
+            drop your code below and we&apos;ll rate it — brutally honest or
+            full roast mode
           </Hero.Description>
         </Hero>
 
@@ -72,7 +41,9 @@ export default function Home() {
           <LeaderboardPreview.Description>
             the worst code on the internet, ranked by shame
           </LeaderboardPreview.Description>
-          <LeaderboardTable entries={mockEntries} />
+          <Suspense fallback={<ShameLeaderboardSkeleton />}>
+            <ShameLeaderboard />
+          </Suspense>
         </LeaderboardPreview>
 
         <div className="h-16" />
