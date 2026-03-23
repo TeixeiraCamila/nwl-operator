@@ -15,6 +15,7 @@
     "db:seed": "tsx src/db/seed.ts",
     "docker": "docker compose up -d"
   },
+  
   "dependencies": {
     "@base-ui-components/react": "1.0.0-rc.0",
     "@number-flow/react": "^0.6.0",

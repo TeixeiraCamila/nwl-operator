@@ -9,6 +9,8 @@ import {
 import { StatsMetrics } from "@/components/stats-metrics";
 import { HomeClient } from "./home-client";
 
+export const revalidate = 3600;
+
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center bg-bg-page px-10 py-10">

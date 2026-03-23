@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Button, FooterHint, Hero, LeaderboardEntry } from "@/components";
+import type { BundledLanguage } from "shiki";
+import { ShameLeaderboardEntry } from "@/app/shame-leaderboard-entry";
+import { Hero } from "@/components";
+import { CodeBlock } from "@/components/code-block";
+import { createTRPCContext } from "@/trpc/init";
+import { createCaller } from "@/trpc/server";
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Shame Leaderboard | devroast",
@@ -13,51 +19,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LeaderboardPage() {
-  const entries = [
-    {
-      rank: 1,
-      score: 1.2,
-      code: [
-        'eval(prompt("enter code"))',
-        "document.write(response)",
-        "// trust the user lol",
-      ],
-      lang: "javascript",
-    },
-    {
-      rank: 2,
-      score: 1.8,
-      code: [
-        "if (x == true) { return true; }",
-        "else if (x == false) { return false; }",
-        "else { return !false; }",
-      ],
-      lang: "typescript",
-    },
-    {
-      rank: 3,
-      score: 2.1,
-      code: ["SELECT * FROM users WHERE 1=1", "-- TODO: add authentication"],
-      lang: "sql",
-    },
-    {
-      rank: 4,
-      score: 2.5,
-      code: ["function getItem(arr, index) {", "  return arr[index];", "}"],
-      lang: "javascript",
-    },
-    {
-      rank: 5,
-      score: 2.8,
-      code: [
-        "try { } catch(e) { }",
-        "// error? what error?",
-        "// moving on...",
-      ],
-      lang: "python",
-    },
-  ];
+export default async function LeaderboardPage() {
+  const caller = createCaller(await createTRPCContext());
+  const { entries, totalCount } = await caller.roast.getShameLeaderboard({
+    limit: 20,
+  });
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-bg-page px-10 py-10">
@@ -71,16 +37,26 @@ export default function LeaderboardPage() {
 
         <div className="flex w-full flex-col gap-5">
           {entries.map((entry) => (
-            <LeaderboardEntry
-              key={entry.rank}
+            <ShameLeaderboardEntry
+              key={entry.id}
               rank={entry.rank}
               score={entry.score}
-              code={entry.code}
-              lang={entry.lang}
-            />
+              language={entry.language}
+              lineCount={entry.lineCount}
+            >
+              <CodeBlock
+                code={entry.code}
+                lang={entry.language as BundledLanguage}
+                className="border-0"
+              />
+            </ShameLeaderboardEntry>
           ))}
         </div>
 
+        <p className="font-mono text-xs text-text-tertiary text-center">
+          showing top {entries.length} of {totalCount.toLocaleString()} · view
+          full leaderboard &gt;&gt;
+        </p>
 
         <div className="h-16" />
       </div>
